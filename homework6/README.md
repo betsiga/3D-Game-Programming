@@ -27,55 +27,54 @@
 
 ### 部分主要功能###
 
-1.  巡逻兵碰撞到障碍物，则会自动选下一个点为目标；
+1.巡逻兵碰撞到障碍物，则会自动选下一个点为目标；
 
 首先在挂载在巡逻兵上的PatrolBehaviour.cs里面判断巡逻兵与障碍物碰撞
 
 ```
-void OnCollisionStay(Collision e) {
-        if (e.gameObject.name.Contains("Patrol") || e.gameObject.name.Contains("fence")
-            || e.gameObject.tag.Contains("FenceAround")) {
-            isCatching = false;
-            addAction.addRandomMovement(this.gameObject, false);
-        }
-        ...
-    }
+	void OnCollisionStay(Collision e) {
+		if (e.gameObject.name.Contains("Patrol") || e.gameObject.name.Contains("fence") || e.gameObject.tag.Contains("FenceAround")) {
+			isCatching = false;
+			addAction.addRandomMovement(this.gameObject, false);
+		}
+		...
+	}
 ```
 
 然后具体实现放到GameModel.cs中，添加随机移动方向
 	
 ```
 	public void addRandomMovement(GameObject sourceObj, bool isActive) {
-        int index = getIndexOfObj(sourceObj);
-        int randomDir = getRandomDirection(index, isActive);
-        PatrolLastDir[index] = randomDir;
-        sourceObj.transform.rotation = Quaternion.Euler(new Vector3(0, randomDir * 90, 0));
-        Vector3 target = sourceObj.transform.position;
-        switch (randomDir) {
-            case Diretion.UP:
-                target += new Vector3(0, 0, 1);
-                break;
-            case Diretion.DOWN:
-                target += new Vector3(0, 0, -1);
-                break;
-            case Diretion.LEFT:
-                target += new Vector3(-1, 0, 0);
-                break;
-            case Diretion.RIGHT:
-                target += new Vector3(1, 0, 0);
-                break;
-        }
-        addSingleMoving(sourceObj, target, PERSON_SPEED_NORMAL, false);
-    }
+		int index = getIndexOfObj(sourceObj);
+		int randomDir = getRandomDirection(index, isActive);
+		PatrolLastDir[index] = randomDir;
+		sourceObj.transform.rotation = Quaternion.Euler(new Vector3(0, randomDir * 90, 0));
+		Vector3 target = sourceObj.transform.position;
+		switch (randomDir) {
+			case Diretion.UP;
+				target += new Vector3(0, 0, 1);
+				break;
+			case Diretion.DOWN:
+				target += new Vector3(0, 0, -1);
+				break;
+			case Diretion.LEFT:
+				target += new Vector3(-1, 0, 0);
+				break;
+			case Diretion.RIGHT:
+				target += new Vector3(1, 0, 0);
+				break;
+		}
+		addSingleMoving(sourceObj, target, PERSON_SPEED_NORMAL, false);
+	}
 ```
 	
 
-2. 订阅与发布模式
+2.订阅与发布模式
 
 通过GameEventManager.cs发布玩家得分与游戏进行情况的信息，TextBehaviour.cs来获得信息。这样做分离了代码功能，信息的发布者只考虑发布信息，而不考虑订阅者如何利用信息。
 
 ```
-//GameEventManager.cs
+	//GameEventManager.cs
 	public delegate void GameOverAction();
 	public static event GameOverAction myGameOverAction;
 	public void patrolHitPlayerAndGameover() {
@@ -83,11 +82,11 @@ void OnCollisionStay(Collision e) {
 		myGameOverAction();
 	}
     
-//TextBehaviour.cs
+	//TextBehaviour.cs
 	void OnEnable() {
 	GameEventManager.myGameScoreAction += gameScore;
 	GameEventManager.myGameOverAction += gameOver;
-    }
+	}
     
 	void gameScore() {
 		if (textType == 0) {
@@ -103,10 +102,10 @@ void OnCollisionStay(Collision e) {
 
 ```
 
-3. 巡逻兵的速度随着时间逐渐增大
+3.巡逻兵的速度随着时间逐渐增大
 
 ```
-//GameModel.cs
+	//GameModel.cs
 	private float normal_speed = 0.05f;
 	private float catching_speed = 0.06f;
 	
